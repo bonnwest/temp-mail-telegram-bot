@@ -32,27 +32,36 @@ class EmailProvider:
 
 
 
+    LISTENER_TIMEOUT = 5 * 60  # stop polling after 5 minutes
+    POLL_INTERVAL = 10          # seconds between each check
+
     def start_listener(self, token, bot, tg_id, loop):
-        def listener(message):
+        def send(message):
             subject = message.get('subject', 'no subject')
             content = message.get('text', 'empty mail') or message.get('html') or 'empty content'
-            sender_data = message.get('from', {})
-            sender = sender_data.get('address', 'unknown sender')
-            
+            sender = message.get('from', {}).get('address', 'unknown sender')
             text = f"from: {sender}\nsubject: {subject}\n\n{content}"
-            
-            asyncio.run_coroutine_threadsafe(
-                bot.send_message(tg_id, text), 
-                loop
-            )
+            asyncio.run_coroutine_threadsafe(bot.send_message(tg_id, text), loop)
 
         def run():
-            try:
-                account = Email()
-                account.token = token
-                account.start(listener, interval=5)
-            except Exception as e:
-                print(f"Listener crash: {e}")
+            stop = threading.Event()
+            threading.Timer(self.LISTENER_TIMEOUT, stop.set).start()
+            seen_ids: set = set()
+            headers = {"Authorization": f"Bearer {token}"}
+
+            while not stop.is_set():
+                try:
+                    response = requests.get("https://api.mail.tm/messages", headers=headers, timeout=10)
+                    response.raise_for_status()
+                    for msg in response.json().get("hydra:member", []):
+                        msg_id = msg.get("id") or msg.get("@id")
+                        if msg_id and msg_id not in seen_ids:
+                            seen_ids.add(msg_id)
+                            send(msg)
+                except Exception as e:
+                    print(f"Listener error: {e}")
+
+                stop.wait(self.POLL_INTERVAL)
 
         threading.Thread(target=run, daemon=True).start()
         
