@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TempMail Bot — Disposable Emails on Telegram</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="badge">Open Source · Free</div>
+      <h1>Disposable emails,<br/>right inside Telegram.</h1>
+      <p class="sub">Generate a real temporary inbox in one tap. Try the live demo — emails actually arrive. No sign-up, no tracking.</p>
+      <a class="btn-primary" href="https://t.me/anonybox_bot" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 14.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+        Open in Telegram
+      </a>
+      <a class="btn-secondary" href="https://github.com/bonnwest/temp-mail-telegram-bot" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        View on GitHub
+      </a>
+    </div>
+
+    <!-- PHONE MOCKUP -->
+    <div class="phone-wrap">
+      <div class="demo-label"><span class="live-dot"></span> Live Demo — real emails</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="chat-header">
+          <div class="chat-avatar">✉️</div>
+          <div>
+            <div class="chat-name">TempMail Bot</div>
+            <div class="chat-status" id="chatStatus">online</div>
+          </div>
+        </div>
+        <div class="chat-body" id="chatBody"></div>
+        <div class="chat-keyboard">
+          <button class="kb-btn" id="kbGet">Get Email</button>
+          <button class="kb-btn" id="kbCheck">Check Inbox</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <h2>Everything you need, nothing you don't.</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feat-icon">⚡</div>
+        <h3>Instant inbox</h3>
+        <p>A real <code>mail.tm</code> address is created in seconds. No forms, no captchas.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🔔</div>
+        <h3>Live push</h3>
+        <p>A background listener polls every 5 s and forwards new mail to you the moment it arrives.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🛡️</div>
+        <h3>Rate limited</h3>
+        <p>New address: 5-min cooldown. Inbox check: 30-sec cooldown. Prevents API abuse automatically.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🗄️</div>
+        <h3>Persistent sessions</h3>
+        <p>Your active address and token are stored in SQLite so you never lose your inbox on restart.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🔒</div>
+        <h3>Private by default</h3>
+        <p>Each Telegram user gets their own isolated inbox. No shared state, no data leaks.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🐍</div>
+        <h3>Simple stack</h3>
+        <p>Pure Python — aiogram 3, aiosqlite, mailtm, python-dotenv. One <code>pip install</code> away.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li>
+        <span class="step-num">1</span>
+        <div>
+          <strong>Start the bot</strong>
+          <p>Send <code>/start</code> to the bot on Telegram. You'll see two buttons: <em>Get Email</em> and <em>Check Inbox</em>.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">2</span>
+        <div>
+          <strong>Generate an address</strong>
+          <p>Tap <em>Get Email</em>. The bot calls the mail.tm API, creates a fresh inbox, and replies with your new address.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">3</span>
+        <div>
+          <strong>Wait or check manually</strong>
+          <p>Mail arrives automatically via the background listener, or tap <em>Check Inbox</em> to pull messages on demand.</p>
+        </div>
+      </li>
+      <li>
+        <span class="step-num">4</span>
+        <div>
+          <strong>Auto-cleanup</strong>
+          <p>The listener stops after 5 minutes. Tap <em>Get Email</em> again whenever you need a fresh address.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- SELF HOSTING -->
+  <section class="selfhost">
+    <h2>Self-host in 60 seconds</h2>
+    <div class="code-block">
+      <pre><code><span class="cm"># 1. Clone</span>
+git clone https://github.com/bonnwest/temp-mail-telegram-bot
+cd temp-mail-telegram-bot
+
+<span class="cm"># 2. Install deps</span>
+python -m venv venv &amp;&amp; source venv/bin/activate
+pip install -r requirements.txt
+
+<span class="cm"># 3. Configure</span>
+echo "TELEGRAM_TOKEN=your_token_here" &gt; .env
+
+<span class="cm"># 4. Run</span>
+python bot.py</code></pre>
+      <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    </div>
+    <p class="selfhost-note">Get your token from <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> — it takes under a minute.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Built with aiogram 3 · MIT License · <a href="https://github.com/bonnwest/temp-mail-telegram-bot" target="_blank" rel="noopener">GitHub</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
