@@ -2,3 +2,4 @@ dotenv
 sqlalchemy
 aiosqlite
 aiogram
+mailtm
