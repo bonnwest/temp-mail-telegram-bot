@@ -4,6 +4,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from services.email_provider import EmailProvider
+from services.rate_limiter import RateLimiter
 from database.db import Database
 from dotenv import load_dotenv
 
@@ -18,6 +19,10 @@ dp = Dispatcher()
 # class initialization
 provider = EmailProvider()
 db = Database()
+limiter = RateLimiter()
+
+NEW_MAIL_COOLDOWN = 5 * 60   # 5 minutes
+CHECK_INBOX_COOLDOWN = 30    # 30 seconds
 
 @dp.message(Command("start"))
 async def start_handler(message: types.Message):
@@ -34,6 +39,13 @@ async def start_handler(message: types.Message):
 
 @dp.message(F.text == "Get Email")
 async def generate_email(message: types.Message):
+    allowed, remaining = limiter.is_allowed("new_mail", message.from_user.id, NEW_MAIL_COOLDOWN)
+    if not allowed:
+        mins, secs = divmod(int(remaining), 60)
+        wait = f"{mins}m {secs}s" if mins else f"{secs}s"
+        await message.answer(f"Please wait {wait} before requesting a new email.")
+        return
+
     email, token = provider.create_email()
     if email and token:
         await db.add_or_update_user(message.from_user.id, message.from_user.username, email, token)
@@ -44,6 +56,11 @@ async def generate_email(message: types.Message):
 
 @dp.message(F.text == "Check Inbox")
 async def check_email(message: types.Message):
+    allowed, remaining = limiter.is_allowed("check_inbox", message.from_user.id, CHECK_INBOX_COOLDOWN)
+    if not allowed:
+        await message.answer(f"Please wait {int(remaining)}s before checking again.")
+        return
+
     user = await db.get_user_by_telegram_id(message.from_user.id)
     if user:
         messages = provider.get_messages_sync(user['token'])
